@@ -23,7 +23,7 @@ let cols, rows;
 let time = 0;
 let renderMode = 0;      // 0-4
 let isStarted = false;
-let speedMult = 1.0;
+let speedMult = 1.8;
 
 // Global Background Toggles
 let bgVideoEnabled = true;
@@ -238,6 +238,29 @@ function init() {
   document.getElementById('toggle-video-btn')?.addEventListener('click', () => {
     bgVideoEnabled = !bgVideoEnabled;
     updateBackgrounds();
+  });
+
+  window.ytIsPaused = false;
+  document.getElementById('play-pause-btn')?.addEventListener('click', () => {
+    const yt = document.querySelector('#youtube-bg iframe');
+    if (yt && yt.contentWindow) {
+      if (!window.ytIsPaused) {
+        yt.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        window.ytIsPaused = true;
+      } else {
+        yt.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        window.ytIsPaused = false;
+      }
+    }
+  });
+
+  document.getElementById('replay-btn')?.addEventListener('click', () => {
+    const yt = document.querySelector('#youtube-bg iframe');
+    if (yt && yt.contentWindow) {
+      yt.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[0, true]}', '*');
+      yt.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+      window.ytIsPaused = false;
+    }
   });
 
   document.getElementById('toggle-webcam-btn')?.addEventListener('click', () => {
