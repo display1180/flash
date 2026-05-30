@@ -332,7 +332,7 @@ function setMode(m) {
   renderMode = m;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.mode-btn')[m]?.classList.add('active');
-  const names = ['PLASMA', 'VORTEX', 'MATRIX', 'SHOCKWAVE', 'GLITCH', 'DECODE', 'SWARM', 'HYPERSPACE', 'RADAR', 'BIOLUM', 'OVERRIDE', 'MELTDOWN', 'INFECTED', 'CRITICAL', 'PRISM', 'CHROMATIC', 'DISCO', 'JULIA', 'SIERPINSKI', 'RECURSION', 'STATIC', 'TEARING', 'DATABEND', 'NEURAL', 'SYMBIOSIS', 'SINGULARITY', 'HALO', 'FEATHERS', 'DIVINE', 'TENSOR', 'SCANNER', 'SENTIENCE', 'RAVE SKULL', 'SKELETON CREW', 'X-RAY SPINE', 'IDC SCROLL', 'IDC CHAOS', 'IDC TYPO', 'A, HEARTBEAT', 'A, LOVE RAIN', 'A, NEON LOVE', 'B, MAGNETIC', 'B, RADAR', 'B, BURNING', 'CAM MOTION', 'CAM THERMAL', 'CAM PIXELSORT', 'CAM SILHOUETTE', 'RAW + ASCII'];
+  const names = ['PLASMA', 'VORTEX', 'MATRIX', 'SHOCKWAVE', 'GLITCH', 'DECODE', 'SWARM', 'HYPERSPACE', 'RADAR', 'BIOLUM', 'OVERRIDE', 'MELTDOWN', 'INFECTED', 'CRITICAL', 'PRISM', 'CHROMATIC', 'DISCO', 'JULIA', 'SIERPINSKI', 'RECURSION', 'STATIC', 'TEARING', 'DATABEND', 'NEURAL', 'SYMBIOSIS', 'SINGULARITY', 'HALO', 'FEATHERS', 'DIVINE', 'TENSOR', 'SCANNER', 'SENTIENCE', 'RAVE SKULL', 'SKELETON CREW', 'X-RAY SPINE', 'IDC SCROLL', 'IDC CHAOS', 'IDC TYPO', 'A, HEARTBEAT', 'A, LOVE RAIN', 'A, NEON LOVE', 'B, MAGNETIC', 'B, RADAR', 'B, BURNING', 'CAM MOTION', 'CAM THERMAL', 'CAM PIXELSORT', 'CAM SILHOUETTE', 'RAW + ASCII', 'C, I MISS YOU', 'C, TEARDROPS', 'C, MEMORY'];
   hudMode.textContent = names[m];
   hudMode.style.color = getModePrimaryColor(m);
 
@@ -356,7 +356,7 @@ function setMode(m) {
 }
 
 function getModePrimaryColor(m) {
-  const colors = ['#ff00ff', '#00ffff', '#00ff41', '#ffaa00', '#ff0040', '#ffff00', '#ff00aa', '#ffffff', '#00ff41', '#55ff22', '#00cc00', '#ff0000', '#ff1100', '#ff0033', '#ffffff', '#00ffff', '#ff00ff', '#aa00ff', '#00ffaa', '#ffaa00', '#888888', '#00ffff', '#ffff00', '#ffaa00', '#ff00ff', '#ffffff', '#ffd700', '#ffccff', '#00ccff', '#00ff88', '#ffff00', '#ff0055', '#ff00ff', '#00ffcc', '#ffffff', '#ff3300', '#ffffff', '#ff00aa', '#ff0055', '#ffccff', '#ff00aa', '#cc00ff', '#00ff00', '#ff5500', '#00ccff', '#ff4400', '#ff00ff', '#00ffaa', '#ffffff'];
+  const colors = ['#ff00ff', '#00ffff', '#00ff41', '#ffaa00', '#ff0040', '#ffff00', '#ff00aa', '#ffffff', '#00ff41', '#55ff22', '#00cc00', '#ff0000', '#ff1100', '#ff0033', '#ffffff', '#00ffff', '#ff00ff', '#aa00ff', '#00ffaa', '#ffaa00', '#888888', '#00ffff', '#ffff00', '#ffaa00', '#ff00ff', '#ffffff', '#ffd700', '#ffccff', '#00ccff', '#00ff88', '#ffff00', '#ff0055', '#ff00ff', '#00ffcc', '#ffffff', '#ff3300', '#ffffff', '#ff00aa', '#ff0055', '#ffccff', '#ff00aa', '#cc00ff', '#00ff00', '#ff5500', '#00ccff', '#ff4400', '#ff00ff', '#00ffaa', '#ffffff', '#ff88aa', '#00bbff', '#aa88ff'];
   return colors[m];
 }
 
@@ -473,6 +473,9 @@ function loop(timestamp) {
     case 46: renderWebcamPixelsort(dt); break;
     case 47: renderWebcamSilhouette(dt); break;
     case 48: renderWebcamRawOverlay(dt); break;
+    case 49: renderCIMissYou(dt); break;
+    case 50: renderCTeardrops(dt); break;
+    case 51: renderCMemory(dt); break;
   }
 
   // HUD update (every 8 frames)
@@ -3773,6 +3776,125 @@ function renderWebcamRawOverlay(dt) {
       ctx.fillText(ch, x * CELL, y * CELL);
     }
   }
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODE 49: C, I MISS YOU
+// ═══════════════════════════════════════════════════════
+function renderCIMissYou(dt) {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.textBaseline = 'top';
+  const t = time * 0.5 * speedMult;
+  const msg = "I MISS YOU ";
+
+  for (let y = 0; y < rows; y += 2) {
+    for (let x = 0; x < cols; x += 2) {
+      // Drifting wave motion
+      const wave = Math.sin(x * 0.1 + y * 0.15 - t * 2) + Math.cos(x * 0.05 - t);
+      
+      // Only draw on wave peaks
+      if (wave > 1.2) {
+        const offset = Math.floor((x + y + t * 5) % msg.length);
+        const ch = msg[offset];
+        
+        // Soft pink and white fade
+        const hue = 320 + Math.sin(t + x) * 20; // Pinkish red
+        const lum = 40 + wave * 30;
+        
+        ctx.fillStyle = `hsl(${hue}, 80%, ${Math.min(100, lum)}%)`;
+        
+        // Randomly drift letters
+        const dx = Math.sin(t * 3 + y) * 15;
+        const dy = Math.cos(t * 2 + x) * 15;
+        
+        // Random glitch size
+        const fontSize = Math.random() > 0.95 ? CELL * 2 : CELL;
+        ctx.font = `bold ${fontSize}px monospace`;
+        
+        ctx.fillText(ch, x * CELL + dx, y * CELL + dy);
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODE 50: C, TEARDROPS
+// ═══════════════════════════════════════════════════════
+function renderCTeardrops(dt) {
+  ctx.fillStyle = 'rgba(0, 5, 15, 0.2)'; // Dark blue trailing
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  ctx.font = `bold ${CELL}px monospace`;
+  ctx.textBaseline = 'top';
+  
+  const chars = "💧.·:;+*#@I MISS YOU";
+  const t = time * 2 * speedMult;
+
+  for (let x = 0; x < cols; x++) {
+    // Teardrop falling speed and offset per column
+    const colSpeed = 1 + Math.sin(x * 0.5) * 0.5;
+    const colOffset = Math.sin(x * 12.3) * 100;
+    
+    const dropY = ((t * 10 * colSpeed + colOffset) % rows + rows) % rows;
+    
+    // Check if we are near the drop
+    for (let y = 0; y < rows; y++) {
+      const dist = Math.abs(y - dropY);
+      
+      if (dist < 4 || dist > rows - 4) {
+        const ch = chars[Math.floor(Math.random() * chars.length)];
+        
+        // Cyan/Blue tears
+        const hue = 190 + Math.random() * 30;
+        const lum = dist < 1 ? 100 : (100 - dist * 25);
+        ctx.fillStyle = `hsl(${hue}, 100%, ${lum}%)`;
+        
+        ctx.fillText(ch, x * CELL, y * CELL);
+      }
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  MODE 51: C, MEMORY
+// ═══════════════════════════════════════════════════════
+function renderCMemory(dt) {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  const t = time * speedMult;
+  
+  // Hazy static noise
+  for (let i = 0; i < 200; i++) {
+    const x = Math.floor(Math.random() * cols);
+    const y = Math.floor(Math.random() * rows);
+    const ch = Math.random() > 0.5 ? "I" : "U";
+    
+    ctx.font = `${CELL}px monospace`;
+    ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.3})`;
+    ctx.fillText(ch, x * CELL, y * CELL);
+  }
+  
+  // Large faded text across screen
+  ctx.font = `bold ${CELL * 5}px monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  
+  const glitchOffset = Math.sin(t * 10) > 0.8 ? (Math.random() - 0.5) * 50 : 0;
+  
+  ctx.globalAlpha = 0.5 + Math.sin(t * 2) * 0.3;
+  ctx.fillStyle = '#ff88ff';
+  ctx.fillText("I MISS YOU", canvas.width / 2 + glitchOffset, canvas.height / 2 - 50);
+  
+  ctx.globalAlpha = 0.3 + Math.sin(t * 2.1) * 0.2;
+  ctx.fillStyle = '#00ffff';
+  ctx.fillText("I MISS YOU", canvas.width / 2 - glitchOffset, canvas.height / 2 - 50 + glitchOffset * 0.5);
+  
+  ctx.globalAlpha = 1.0;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
 }
 
 idleLoop();
