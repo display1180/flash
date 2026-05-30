@@ -391,6 +391,13 @@ function startExperience() {
   document.getElementById('speed-panel').classList.add('visible');
   fpsDisplay.classList.add('visible');
 
+  // Ensure YouTube video starts playing if it was blocked by autoplay policies
+  const yt = document.querySelector('#youtube-bg iframe');
+  if (yt && yt.contentWindow) {
+    yt.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+    window.ytIsPaused = false;
+  }
+
   lastFpsTime = performance.now();
   requestAnimationFrame(loop);
 }
