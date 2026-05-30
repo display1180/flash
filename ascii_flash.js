@@ -115,7 +115,34 @@ function initWebcam() {
   webcamCanvas = document.getElementById('webcam-canvas');
   webcamCtx = webcamCanvas.getContext('2d', { willReadFrequently: true });
   
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } })
+  // 1. Initial request to trigger permissions
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(initialStream => {
+      // 2. Enumerate devices once permission is granted
+      return navigator.mediaDevices.enumerateDevices()
+        .then(devices => {
+          // Look for an iPhone camera (Continuity Camera feature in macOS)
+          const iphoneCam = devices.find(d => d.kind === 'videoinput' && d.label.toLowerCase().includes('iphone'));
+          
+          initialStream.getTracks().forEach(t => t.stop()); // Stop generic stream
+
+          if (iphoneCam) {
+            console.log("iPhone Camera detected:", iphoneCam.label);
+            return navigator.mediaDevices.getUserMedia({
+              video: {
+                deviceId: { exact: iphoneCam.deviceId },
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+              }
+            });
+          } else {
+            console.log("No iPhone camera found, using default.");
+            return navigator.mediaDevices.getUserMedia({
+              video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'environment' }
+            });
+          }
+        });
+    })
     .then(stream => {
       webcamVideo.srcObject = stream;
       webcamVideo.play();
@@ -130,7 +157,7 @@ function initWebcam() {
     })
     .catch(err => {
       console.error("Camera access denied or unavailable", err);
-      alert("Camera access is required for WEBCAM LIQUID mode.");
+      alert("Camera access is required. Make sure your iPhone is near and unlocked for Continuity Camera.");
     });
 }
 
