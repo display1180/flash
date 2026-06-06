@@ -312,6 +312,31 @@ function init() {
     }
   });
 
+  document.getElementById('yt-submit-btn')?.addEventListener('click', () => {
+    const input = document.getElementById('yt-url-input');
+    if (!input) return;
+    const url = input.value.trim();
+    if (!url) return;
+    
+    // Extract video ID from common youtube formats
+    let videoId = '';
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?\n]+)/);
+    if (match && match[1]) {
+      videoId = match[1];
+    } else {
+      videoId = url; // assume they just pasted the ID
+    }
+    
+    if (videoId) {
+      const ytIframe = document.querySelector('#youtube-bg iframe');
+      if (ytIframe) {
+        ytIframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&enablejsapi=1`;
+        window.ytIsPaused = false;
+      }
+    }
+    input.value = ''; // clear input
+  });
+
   const uiToggleBtn = document.getElementById('ui-toggle-btn');
   function toggleUI() {
     const isHidden = document.body.classList.toggle('ui-hidden');
