@@ -196,6 +196,9 @@ function initWebcam() {
       webcamVideo.srcObject = stream;
       webcamVideo.play();
       isWebcamReady = true;
+      if (isHandTrackingActive && cameraInstance) {
+        cameraInstance.start();
+      }
       // Initialize ripple buffers using the ascii grid size
       rippleWidth = cols;
       rippleHeight = rows;
