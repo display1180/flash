@@ -95,6 +95,55 @@ let frameCount = 0;
 let lastFpsTime = 0;
 let currentFps = 60;
 
+// Hand Tracking Globals
+let isHandTrackingActive = false;
+let handLandmarks = [];
+let handsInstance = null;
+let cameraInstance = null;
+let handCanvas = null;
+let handCtx = null;
+let handParticles = []; // To store particle effects
+
+// --- MediaPipe Hand Tracking Init ---
+async function initHandTracking() {
+  if (handsInstance) return; // Already initialized
+
+  handCanvas = document.getElementById('hand-canvas');
+  handCanvas.width = window.innerWidth;
+  handCanvas.height = window.innerHeight;
+  handCtx = handCanvas.getContext('2d');
+
+  handsInstance = new Hands({locateFile: (file) => {
+    return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+  }});
+
+  handsInstance.setOptions({
+    maxNumHands: 2,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5
+  });
+
+  handsInstance.onResults((results) => {
+    handLandmarks = results.multiHandLandmarks || [];
+  });
+
+  const videoElement = document.getElementById('webcam-video');
+  cameraInstance = new Camera(videoElement, {
+    onFrame: async () => {
+      if (isHandTrackingActive && videoElement.videoWidth > 0) {
+        await handsInstance.send({image: videoElement});
+      }
+    },
+    width: 640,
+    height: 480
+  });
+  
+  if (isWebcamReady) {
+    cameraInstance.start();
+  }
+}
+
 // ── HUD elements (cached) ──
 let hudMode, hudSpeed, hudChars, hudHue, fpsDisplay;
 
@@ -164,6 +213,8 @@ function initWebcam() {
 // ═══════════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════════
+
+window.onload = init;
 
 function init() {
   hudMode  = document.getElementById('hud-mode');
@@ -335,6 +386,24 @@ function init() {
       }
     }
     input.value = ''; // clear input
+  });
+
+  document.getElementById('hand-tracking-btn')?.addEventListener('click', function() {
+    isHandTrackingActive = !isHandTrackingActive;
+    if (isHandTrackingActive) {
+      this.classList.add('active');
+      this.style.background = '#ff00ff';
+      this.style.color = '#000';
+      if (!isWebcamReady) initWebcam();
+      initHandTracking();
+      if (cameraInstance && isWebcamReady) cameraInstance.start();
+    } else {
+      this.classList.remove('active');
+      this.style.background = 'transparent';
+      this.style.color = '#ff00ff';
+      if (handCtx) handCtx.clearRect(0, 0, handCanvas.width, handCanvas.height);
+      handLandmarks = [];
+    }
   });
 
   const uiToggleBtn = document.getElementById('ui-toggle-btn');
@@ -599,6 +668,80 @@ function loop(timestamp) {
     hudHue.textContent = Math.floor(globalHue) + '°';
     hudHue.style.color = `hsl(${globalHue}, 100%, 65%)`;
   }
+  
+  if (isHandTrackingActive) {
+    renderHandTracking();
+  }
+}
+
+function renderHandTracking() {
+  if (!handCtx) return;
+  handCtx.clearRect(0, 0, handCanvas.width, handCanvas.height);
+  if (!handLandmarks || handLandmarks.length === 0) {
+    // Keep updating particles even if hand is lost briefly
+    updateAndDrawHandParticles();
+    return;
+  }
+  
+  handCtx.save();
+  handLandmarks.forEach((landmarks) => {
+    // MediaPipe helper functions from drawing_utils
+    if (typeof drawConnectors !== 'undefined' && typeof HAND_CONNECTIONS !== 'undefined') {
+      drawConnectors(handCtx, landmarks, HAND_CONNECTIONS, {color: 'rgba(0, 255, 255, 0.5)', lineWidth: 2});
+      drawLandmarks(handCtx, landmarks, {color: 'rgba(255, 0, 255, 0.8)', lineWidth: 1, radius: 2});
+    }
+    
+    // Fingertips: 4 (thumb), 8 (index), 12 (middle), 16 (ring), 20 (pinky)
+    const fingerTips = [4, 8, 12, 16, 20];
+    fingerTips.forEach(tip => {
+      const lm = landmarks[tip];
+      if (!lm) return;
+      const x = lm.x * handCanvas.width;
+      const y = lm.y * handCanvas.height;
+      
+      // Spawn particles
+      for(let k=0; k<2; k++) {
+        handParticles.push({
+          x: x + (Math.random()-0.5)*10, 
+          y: y + (Math.random()-0.5)*10,
+          vx: (Math.random() - 0.5) * 3,
+          vy: (Math.random() - 0.5) * 3 - 2,
+          life: 1.0,
+          char: CHAR_SETS.ascii[Math.floor(Math.random() * CHAR_SETS.ascii.length)],
+          color: `hsl(${(globalHue + Math.random()*60)%360}, 100%, 70%)`
+        });
+      }
+    });
+  });
+  handCtx.restore();
+  
+  updateAndDrawHandParticles();
+}
+
+function updateAndDrawHandParticles() {
+  if (!handCtx) return;
+  handCtx.save();
+  handCtx.font = '18px monospace';
+  handCtx.textAlign = 'center';
+  handCtx.textBaseline = 'middle';
+  
+  for (let i = handParticles.length - 1; i >= 0; i--) {
+    let p = handParticles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.life -= 0.03;
+    if (p.life <= 0) {
+      handParticles.splice(i, 1);
+    } else {
+      handCtx.fillStyle = p.color;
+      handCtx.globalAlpha = p.life;
+      // Add a slight glow
+      handCtx.shadowBlur = 5;
+      handCtx.shadowColor = p.color;
+      handCtx.fillText(p.char, p.x, p.y);
+    }
+  }
+  handCtx.restore();
 }
 
 // ═══════════════════════════════════════════════════════
