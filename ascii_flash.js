@@ -463,6 +463,11 @@ function resize() {
   cols = Math.floor(canvas.width / CELL);
   rows = Math.floor(canvas.height / CELL);
   initMatrixDrops();
+  
+  if (handCanvas) {
+    handCanvas.width = window.innerWidth;
+    handCanvas.height = window.innerHeight;
+  }
 }
 
 function updateVideoTransform() {
@@ -677,6 +682,34 @@ function loop(timestamp) {
 function renderHandTracking() {
   if (!handCtx) return;
   handCtx.clearRect(0, 0, handCanvas.width, handCanvas.height);
+  
+  // --- Draw Webcam Feed ---
+  const videoElement = document.getElementById('webcam-video');
+  if (videoElement && videoElement.readyState >= 2 && videoElement.videoWidth > 0) {
+    handCtx.save();
+    // Flip horizontally to act as a mirror
+    handCtx.translate(handCanvas.width, 0);
+    handCtx.scale(-1, 1);
+    
+    const canvasAspect = handCanvas.width / handCanvas.height;
+    const videoAspect = videoElement.videoWidth / videoElement.videoHeight;
+    let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
+    
+    if (canvasAspect > videoAspect) {
+      drawWidth = handCanvas.width;
+      drawHeight = handCanvas.width / videoAspect;
+      offsetY = (handCanvas.height - drawHeight) / 2;
+    } else {
+      drawHeight = handCanvas.height;
+      drawWidth = handCanvas.height * videoAspect;
+      offsetX = (handCanvas.width - drawWidth) / 2;
+    }
+    
+    handCtx.globalAlpha = 0.65; // Translucent so ASCII art shows through
+    handCtx.drawImage(videoElement, offsetX, offsetY, drawWidth, drawHeight);
+    handCtx.restore();
+  }
+
   if (!handLandmarks || handLandmarks.length === 0) {
     // Keep updating particles even if hand is lost briefly
     updateAndDrawHandParticles();
