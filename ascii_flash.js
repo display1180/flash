@@ -481,27 +481,23 @@ function initClipDeck() {
     container.appendChild(btn);
   });
   
-  // Load dynamic local assets into dropdown
-  const dropdown = document.getElementById('asset-dropdown');
-  if (dropdown) {
-    fetch('assets.json')
-      .then(res => res.json())
-      .then(assets => {
-        assets.forEach(asset => {
-          const option = document.createElement('option');
-          option.value = asset.src;
-          option.textContent = asset.label;
-          dropdown.appendChild(option);
-        });
-        
-        dropdown.addEventListener('change', (e) => {
-          if (e.target.value) {
-            playClip({ type: 'local', src: e.target.value });
-          }
-        });
-      })
-      .catch(err => console.log('No local assets.json found or failed to load.'));
-  }
+  // Load dynamic local assets into the grid
+  fetch('assets.json')
+    .then(res => res.json())
+    .then(assets => {
+      assets.forEach(asset => {
+        const btn = document.createElement('button');
+        btn.className = 'mode-btn';
+        btn.textContent = asset.label;
+        btn.title = asset.id; // full name on hover
+        btn.style.overflow = 'hidden';
+        btn.style.textOverflow = 'ellipsis';
+        btn.style.whiteSpace = 'nowrap';
+        btn.onclick = () => playClip({ type: 'local', src: asset.src });
+        container.appendChild(btn);
+      });
+    })
+    .catch(err => console.log('No local assets.json found or failed to load.'));
   
   // Shortcut keys 1-9
   window.addEventListener('keydown', (e) => {
