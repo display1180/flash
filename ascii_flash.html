@@ -368,7 +368,10 @@
         <!-- Buttons injected by JS -->
       </div>
       <div style="display: flex; gap: 5px; align-items: center; margin-left: 10px;">
-        <input type="text" id="yt-url-input" placeholder="YouTube URL..." style="background: rgba(0,0,0,0.5); border: 1px solid #555; color: #fff; padding: 4px 8px; width: 150px; font-family: 'Space Mono', monospace; font-size: 10px; outline: none; border-radius: 2px;">
+        <select id="asset-dropdown" style="background: rgba(0,0,0,0.8); border: 1px solid #555; color: #00ffaa; padding: 4px 8px; width: 180px; font-family: 'Space Mono', monospace; font-size: 10px; outline: none; border-radius: 2px;">
+          <option value="">-- Load Asset --</option>
+        </select>
+        <input type="text" id="yt-url-input" placeholder="YouTube URL..." style="background: rgba(0,0,0,0.5); border: 1px solid #555; color: #fff; padding: 4px 8px; width: 150px; font-family: 'Space Mono', monospace; font-size: 10px; outline: none; border-radius: 2px; margin-left: 5px;">
         <button id="yt-submit-btn" class="mode-btn" style="border-color: #ffd700; color: #ffd700; padding: 3px 8px;">GO</button>
       </div>
     </div>

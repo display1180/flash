@@ -481,6 +481,28 @@ function initClipDeck() {
     container.appendChild(btn);
   });
   
+  // Load dynamic local assets into dropdown
+  const dropdown = document.getElementById('asset-dropdown');
+  if (dropdown) {
+    fetch('assets.json')
+      .then(res => res.json())
+      .then(assets => {
+        assets.forEach(asset => {
+          const option = document.createElement('option');
+          option.value = asset.src;
+          option.textContent = asset.label;
+          dropdown.appendChild(option);
+        });
+        
+        dropdown.addEventListener('change', (e) => {
+          if (e.target.value) {
+            playClip({ type: 'local', src: e.target.value });
+          }
+        });
+      })
+      .catch(err => console.log('No local assets.json found or failed to load.'));
+  }
+  
   // Shortcut keys 1-9
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
