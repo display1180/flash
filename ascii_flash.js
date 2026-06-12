@@ -523,9 +523,11 @@ function initClipDeck() {
   });
   
   // Load dynamic local assets into the grid
+  window._loadedAssets = [];
   fetch('assets.json')
     .then(res => res.json())
     .then(assets => {
+      window._loadedAssets = assets;
       assets.forEach(asset => {
         const btn = document.createElement('button');
         btn.className = 'mode-btn';
@@ -540,6 +542,46 @@ function initClipDeck() {
     })
     .catch(err => console.log('No local assets.json found or failed to load.'));
   
+  // Random auto-play
+  window._randomInterval = null;
+  const randomBtn = document.getElementById('random-play-btn');
+  if (randomBtn) {
+    randomBtn.addEventListener('click', () => {
+      if (window._randomInterval) {
+        clearInterval(window._randomInterval);
+        window._randomInterval = null;
+        randomBtn.textContent = '🔀 RANDOM';
+        randomBtn.style.background = '';
+      } else {
+        const playRandom = () => {
+          const all = [...VJ_CLIPS, ...window._loadedAssets.map(a => ({ type: 'local', src: a.src }))];
+          if (all.length === 0) return;
+          const pick = all[Math.floor(Math.random() * all.length)];
+          playClip(pick);
+        };
+        playRandom();
+        window._randomInterval = setInterval(playRandom, 8000);
+        randomBtn.textContent = '⏹ STOP';
+        randomBtn.style.background = 'rgba(0,255,170,0.15)';
+      }
+    });
+  }
+
+  // Panel hide/show toggle
+  const panelToggle = document.getElementById('panel-toggle-btn');
+  const splitPanels = panelToggle?.previousElementSibling;
+  if (panelToggle && splitPanels) {
+    panelToggle.addEventListener('click', () => {
+      if (splitPanels.style.display === 'none') {
+        splitPanels.style.display = 'flex';
+        panelToggle.textContent = '▼ HIDE PANELS';
+      } else {
+        splitPanels.style.display = 'none';
+        panelToggle.textContent = '▲ SHOW PANELS';
+      }
+    });
+  }
+
   // Shortcut keys 1-9
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
