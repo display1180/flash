@@ -470,23 +470,44 @@ function playClip(clip) {
     ytPlayer.src = `https://www.youtube.com/embed/${clip.src}?autoplay=1&mute=1&loop=1&playlist=${clip.src}&controls=0&showinfo=0&rel=0&enablejsapi=1`;
   } else if (clip.type === 'local') {
     ytPlayer.style.display = 'none';
-    ytPlayer.src = ''; // Stop youtube video
+    ytPlayer.src = '';
     
     const nextPlayer = window.activeLocalPlayer === 1 ? local2 : local1;
     const currPlayer = window.activeLocalPlayer === 1 ? local1 : local2;
     
+    // Prepare next player hidden behind current one
     nextPlayer.style.display = 'block';
+    nextPlayer.style.opacity = 0;
     nextPlayer.src = clip.src;
-    nextPlayer.onloadeddata = () => {
+    nextPlayer.load();
+    
+    const doSwap = () => {
       nextPlayer.play().then(() => {
-        nextPlayer.style.opacity = 1;
-        currPlayer.style.opacity = 0;
-        currPlayer.style.display = 'none';
-        currPlayer.pause();
-        window.activeLocalPlayer = window.activeLocalPlayer === 1 ? 2 : 1;
+        // Wait one animation frame so the browser actually paints the first frame
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            // Now the frame is truly rendered — snap!
+            nextPlayer.style.opacity = 1;
+            currPlayer.style.opacity = 0;
+            currPlayer.style.display = 'none';
+            currPlayer.pause();
+            currPlayer.removeAttribute('src');
+            window.activeLocalPlayer = window.activeLocalPlayer === 1 ? 2 : 1;
+          });
+        });
       }).catch(e => console.log("Auto-play prevented", e));
-      nextPlayer.onloadeddata = null;
     };
+    
+    // Wait until enough data is buffered for smooth playback
+    nextPlayer.oncanplaythrough = () => {
+      nextPlayer.oncanplaythrough = null;
+      doSwap();
+    };
+    // Fallback in case canplaythrough already fired
+    if (nextPlayer.readyState >= 4) {
+      nextPlayer.oncanplaythrough = null;
+      doSwap();
+    }
   }
 }
 
