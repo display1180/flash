@@ -435,20 +435,18 @@ function init() {
   }
   uiToggleBtn?.addEventListener('click', toggleUI);
   
-  // Dedicated Panels Toggle (Media Deck + Effects)
+  // Dedicated Panels Toggle (Media Deck + Effects + Speed Panel)
   const panelToggleBtn = document.getElementById('panel-toggle-btn');
-  const splitPanels = document.getElementById('split-panels');
+  const bottomUIWrapper = document.getElementById('bottom-ui-wrapper');
   let panelsHidden = false;
-  if (panelToggleBtn && splitPanels) {
+  if (panelToggleBtn && bottomUIWrapper) {
     panelToggleBtn.addEventListener('click', () => {
       panelsHidden = !panelsHidden;
-      // We toggle a specific class or inline display, but inline display is safer for this specific element.
-      // Wait, inline display breaks it! Let's use display: none
       if (panelsHidden) {
-        splitPanels.style.display = 'none';
+        bottomUIWrapper.classList.add('hidden-override');
         panelToggleBtn.textContent = '⬆️ SHOW PANELS';
       } else {
-        splitPanels.style.display = 'flex'; // Restore original inline style
+        bottomUIWrapper.classList.remove('hidden-override');
         panelToggleBtn.textContent = '⬇️ HIDE PANELS';
       }
     });

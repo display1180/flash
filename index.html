@@ -203,6 +203,10 @@
       justify-content: center;
       align-items: center;
       gap: 12px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      border-top: 1px solid #333;
+      padding: 10px 0;
       opacity: 0;
       transition: opacity 1s;
       pointer-events: none;
@@ -347,6 +351,8 @@
 
   <div id="fps-display">60 FPS</div>
 
+  <button id="panel-toggle-btn" class="mode-btn" style="position: fixed; bottom: 30vh; right: 20px; z-index: 10000; border-color: #ffaa00; color: #ffaa00; background: rgba(0,0,0,0.8); pointer-events: auto;">⬇️ HIDE PANELS</button>
+
   <!-- Bottom UI Wrapper -->
   <div id="bottom-ui-wrapper">
     <!-- Speed Control -->
@@ -360,7 +366,6 @@
       <button id="toggle-webcam-btn" class="mode-btn" style="margin-left: 10px;">📷 TOGGLE WEBCAM</button>
       <button id="full-cam-btn" class="mode-btn" style="margin-left: 10px; border-color: #00ffaa; color: #00ffaa;">📱 FULL CAM</button>
       <button id="hand-tracking-btn" class="mode-btn" style="margin-left: 10px; border-color: #ff00ff; color: #ff00ff;">🖐️ HAND TRACKING</button>
-      <button id="panel-toggle-btn" class="mode-btn" style="margin-left: 10px; border-color: #ffaa00; color: #ffaa00;">⬇️ HIDE PANELS</button>
     </div>
 
     <!-- Bottom Split Panels -->
@@ -443,6 +448,6 @@
     </div>
   </div>
 
-  <script src="ascii_flash.js?v=17"></script>
+  <script src="ascii_flash.js?v=18"></script>
 </body>
 </html>
