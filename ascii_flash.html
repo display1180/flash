@@ -286,32 +286,7 @@
       opacity: 1 !important;
       display: block !important;
     }
-    #ui-toggle-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 10000;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: rgba(255, 255, 255, 0.5);
-      padding: 6px 10px;
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: none;
-    }
-    #ui-toggle-btn:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-      border-color: rgba(255, 255, 255, 0.6);
-    }
-    .ui-hidden #hud,
-    .ui-hidden #fps-display,
-    .ui-hidden #bottom-ui-wrapper,
-    .ui-hidden #split-panels {
-      display: none !important;
-    }
+
   
     .hidden-override {
       display: none !important;
@@ -330,9 +305,6 @@
 
   <!-- Hand Tracking Overlay Canvas -->
   <canvas id="hand-canvas" style="position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:90000;"></canvas>
-
-  <!-- UI Toggle Button -->
-  <button id="ui-toggle-btn">👁️ HIDE UI (H)</button>
 
   <!-- Webcam Elements -->
   <video id="webcam-video" autoplay playsinline style="display:none;"></video>
@@ -451,6 +423,6 @@
     </div>
   </div>
 
-  <script src="ascii_flash.js?v=19"></script>
+  <script src="ascii_flash.js?v=20"></script>
 </body>
 </html>
