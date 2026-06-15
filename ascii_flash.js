@@ -432,28 +432,27 @@ function init() {
       uiToggleBtn.textContent = isHidden ? '👁️ SHOW UI (H)' : '👁️ HIDE UI (H)';
       uiToggleBtn.style.opacity = isHidden ? '0.2' : '1';
     }
-    
-    const elementsToHide = [
-      document.getElementById('split-panels'),
-      document.getElementById('bottom-ui-wrapper'),
-      document.getElementById('hud'),
-      document.getElementById('fps-display'),
-      document.getElementById('clip-deck'),
-      document.getElementById('mode-panel'),
-      document.getElementById('speed-panel')
-    ];
-    
-    elementsToHide.forEach(el => {
-      if (el) {
-        if (isHidden) {
-          el.classList.add('hidden-override');
-        } else {
-          el.classList.remove('hidden-override');
-        }
+  }
+  uiToggleBtn?.addEventListener('click', toggleUI);
+  
+  // Dedicated Panels Toggle (Media Deck + Effects)
+  const panelToggleBtn = document.getElementById('panel-toggle-btn');
+  const splitPanels = document.getElementById('split-panels');
+  let panelsHidden = false;
+  if (panelToggleBtn && splitPanels) {
+    panelToggleBtn.addEventListener('click', () => {
+      panelsHidden = !panelsHidden;
+      // We toggle a specific class or inline display, but inline display is safer for this specific element.
+      // Wait, inline display breaks it! Let's use display: none
+      if (panelsHidden) {
+        splitPanels.style.display = 'none';
+        panelToggleBtn.textContent = '⬆️ SHOW PANELS';
+      } else {
+        splitPanels.style.display = 'flex'; // Restore original inline style
+        panelToggleBtn.textContent = '⬇️ HIDE PANELS';
       }
     });
   }
-  uiToggleBtn?.addEventListener('click', toggleUI);
   
   window.addEventListener('keydown', (e) => {
     // Avoid triggering if user is typing in the input
