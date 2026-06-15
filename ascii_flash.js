@@ -436,11 +436,18 @@ function init() {
     const bw = document.getElementById('bottom-ui-wrapper');
     const hud = document.getElementById('hud');
     const fps = document.getElementById('fps-display');
+    const clipDeck = document.getElementById('clip-deck');
+    const modePanel = document.getElementById('mode-panel');
+    const speedPanel = document.getElementById('speed-panel');
     
-    if (sp) sp.style.display = isHidden ? 'none' : '';
-    if (bw) bw.style.display = isHidden ? 'none' : '';
-    if (hud) hud.style.display = isHidden ? 'none' : '';
-    if (fps) fps.style.display = isHidden ? 'none' : '';
+    const displayStyle = isHidden ? 'none' : '';
+    if (sp) sp.style.display = displayStyle;
+    if (bw) bw.style.display = displayStyle;
+    if (hud) hud.style.display = displayStyle;
+    if (fps) fps.style.display = displayStyle;
+    if (clipDeck) clipDeck.style.display = displayStyle;
+    if (modePanel) modePanel.style.display = displayStyle;
+    if (speedPanel) speedPanel.style.display = displayStyle;
   }
   uiToggleBtn?.addEventListener('click', toggleUI);
   
