@@ -21,7 +21,7 @@ const ALL_CHARS = CHAR_SETS.dense + CHAR_SETS.ascii + CHAR_SETS.kanji + CHAR_SET
 let CELL = 22;           // character cell size
 let cols, rows;
 let time = 0;
-let renderMode = 0;      // 0-4
+let renderMode = 2;      // default: MATRIX
 let isStarted = false;
 let speedMult = 1.8;
 
@@ -685,6 +685,7 @@ function startExperience() {
     localPlayer.play().catch(() => {});
   }
 
+  setMode(2); // Start with MATRIX effect
   lastFpsTime = performance.now();
   requestAnimationFrame(loop);
 }
