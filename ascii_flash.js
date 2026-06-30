@@ -576,20 +576,7 @@ function initClipDeck() {
     });
   }
 
-  // Panel hide/show toggle
-  const panelToggle = document.getElementById('panel-toggle-btn');
-  const splitPanels = panelToggle?.previousElementSibling;
-  if (panelToggle && splitPanels) {
-    panelToggle.addEventListener('click', () => {
-      if (splitPanels.style.display === 'none') {
-        splitPanels.style.display = 'flex';
-        panelToggle.textContent = '▼ HIDE PANELS';
-      } else {
-        splitPanels.style.display = 'none';
-        panelToggle.textContent = '▲ SHOW PANELS';
-      }
-    });
-  }
+
 
   // Shortcut keys 1-9
   window.addEventListener('keydown', (e) => {
